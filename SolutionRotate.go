@@ -1,5 +1,4 @@
 func reverse(s []int) {
-	fmt.Println(s)
 	if len(s) > 1 {
 		var i int
 		var j int
@@ -25,4 +24,14 @@ func SolutionRotate(A []int, k int) []int {
 	reverse(A[len(A)-k:])
 	reverse(A)
 	return A
+}
+func SolutionUnique(A []int) int {
+	if len(A) == 0 {
+		return 0
+	}
+	m := make(map[int]bool)
+	for _, value := range A {
+		m[value] = true
+	}
+	return len(m)
 }
