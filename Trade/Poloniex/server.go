@@ -22,35 +22,40 @@ type ticker struct {
 	Last string `json:"last"`
 }
 
-func GetTickers() (tickers []TradeSymbol, err error) {
+func getTickers(respch chan TradeSymbol) {
+	defer close(respch)
+
 	rawurl := poloniexPublicAPIUrl + poloniexTickerPath
 	req, err := http.NewRequest("GET", rawurl, nil)
 	if err != nil {
-		return nil, err
+		return
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, err
+		return
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	var rawTicks map[string]ticker
-	err = json.Unmarshal(body, &rawTicks)
+	err = json.Unmarshal(respBody, &rawTicks)
 	if err != nil {
-		return nil, err
+		return
 	}
-
-	tickers = make([]TradeSymbol, 0, len(rawTicks))
 	for sKey, t := range rawTicks {
 		st := TradeSymbol{
 			Symbol: sKey,
 			Price:  t.Last,
 		}
-		tickers = append(tickers, st)
+		respch <- st
 	}
-	return tickers, nil
+}
+
+func GetTickers() chan TradeSymbol {
+	ch := make(chan TradeSymbol, 1)
+	go getTickers(ch)
+	return ch
 }

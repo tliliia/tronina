@@ -11,7 +11,7 @@ import (
 func Save(ch chan poloniex.TradeSymbol) {
 	file, err := os.OpenFile("trade.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModeAppend)
 	if err != nil {
-		fmt.Println("file err:", err)
+		fmt.Println("open file err:", err)
 		return
 	}
 
@@ -24,6 +24,7 @@ func Save(ch chan poloniex.TradeSymbol) {
 		}
 	}
 	wg.Wait()
+	fmt.Println("wg wait")
 	file.Close()
 }
 
@@ -33,8 +34,6 @@ func localSave(val poloniex.TradeSymbol, wg *sync.WaitGroup, file *os.File) {
 }
 
 func writeToFile(val poloniex.TradeSymbol, file *os.File) {
-	// mu := &sync.Mutex{}
-	// mu.Lock()
 	jsonString, err := json.Marshal(val)
 	if err != nil {
 		fmt.Println("marshal err:", err)
@@ -43,5 +42,4 @@ func writeToFile(val poloniex.TradeSymbol, file *os.File) {
 	if err != nil {
 		fmt.Println("write err:", err)
 	}
-	// mu.Unlock()
 }
