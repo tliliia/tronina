@@ -1,3 +1,5 @@
+package main
+
 func reverse(s []int) {
 	if len(s) > 1 {
 		var i int
